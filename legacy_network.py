@@ -23,10 +23,12 @@ def myNetwork():
                       port=6633)
 
     info( '*** Add switches\n')
+    #Add switches before routers
+    s1 = net.addSwitch('s1', cls=OVSKernelSwitch)
+    s2 = net.addSwitch('s2', cls=OVSKernelSwitch)
+
     r5 = net.addHost('r5', cls=Node, ip='0.0.0.0')
     r5.cmd('sysctl -w net.ipv4.ip_forward=1')
-    s2 = net.addSwitch('s2', cls=OVSKernelSwitch)
-    s1 = net.addSwitch('s1', cls=OVSKernelSwitch)
     r4 = net.addHost('r4', cls=Node, ip='0.0.0.0')
     r4.cmd('sysctl -w net.ipv4.ip_forward=1')
     r3 = net.addHost('r3', cls=Node, ip='0.0.0.0')
