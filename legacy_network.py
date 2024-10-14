@@ -59,6 +59,13 @@ def myNetwork():
 
     info( '*** Starting network\n')
     net.build()
+
+    #Add static routes
+    r3.cmd('ip route add 10.0.2.0/24 via 192.168.1.2 dev r3-eth1') #from r3 to r5's network via r4
+    r5.cmd('ip route add 10.0.1.0/24 via 192.168.2.1 dev r5-eth1') #r5 to r3's network via r4
+    r4.cmd('ip route add 10.0.1.0/24 via 192.168.1.1 dev r4-eth0')  #forward traffic from r3's network
+    r4.cmd('ip route add 10.0.2.0/24 via 192.168.2.2 dev r4-eth1')  #forward traffic to r5's networ
+
     info( '*** Starting controllers\n')
     for controller in net.controllers:
         controller.start()
