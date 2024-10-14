@@ -27,25 +27,26 @@ def myNetwork():
     s2 = net.addSwitch('s2', cls=OVSKernelSwitch)
     s1 = net.addSwitch('s1', cls=OVSKernelSwitch)
     
-    #change r5 ip to 10.0.2.0/24
-    r5 = net.addHost('r5', cls=Node, ip='10.0.2.0/24')
-    r5.cmd('sysctl -w net.ipv4.ip_forward=1')
-   
-    #change r4 ip to 10.0.4.0
-    r4 = net.addHost('r4', cls=Node, ip='10.0.3.0')
+    #Assigned r3 ip to 10.0.1.1/24
+    r3 = net.addHost('r3', cls=Node, ip='10.0.1.1/24')
+    r3.cmd('sysctl -w net.ipv4.ip_forward=1')
+    
+    #Assigned r4 ip to 192.168.1.2/30
+    r4 = net.addHost('r4', cls=Node, ip='192.168.1.2/30')
     r4.cmd('sysctl -w net.ipv4.ip_forward=1')
     
-    #change r2 ip to 10.0.1.0/24
-    r3 = net.addHost('r3', cls=Node, ip='10.0.1.0/24', defaultRoute ='10.0.1.3')
-    r3.cmd('sysctl -w net.ipv4.ip_forward=1')
-
+    #Assigned r5 ip to 10.0.2.1/24
+    r5 = net.addHost('r5', cls=Node, ip='10.0.2.1/24')
+    r5.cmd('sysctl -w net.ipv4.ip_forward=1')
+ 
     info( '*** Add hosts\n')
-    #Changed: h1,h2 ip to 10.0.1.0/24 
-    h1 = net.addHost('h1', cls=Host, ip='10.0.1.0/24', defaultRoute='10.0.1.1')
-    h2 = net.addHost('h2', cls=Host, ip='10.0.1.0/24', defaultRoute='10.0.1.2')
-    #Changed: h3,h4 ip to 10.0.2.0/24 
-    h3 = net.addHost('h3', cls=Host, ip='10.0.2.0/24', defaultRoute='10.0.2.1')
-    h4 = net.addHost('h4', cls=Host, ip='10.0.2.0/24', defaultRoute='10.0.2.2')
+    #Assigned h1,h2 ip to 10.0.1.2/24 and 10.0.1.3/24 respectively
+    h1 = net.addHost('h1', cls=Host, ip='10.0.1.2/24', defaultRoute='via 10.0.1.1')
+    h2 = net.addHost('h2', cls=Host, ip='10.0.1.3/24', defaultRoute='via 10.0.1.1')
+    
+    #Assigned h3,h4 ip to 10.0.2.2/24 and 10.0.2.3/24 respectively
+    h3 = net.addHost('h3', cls=Host, ip='10.0.2.2/24', defaultRoute='via 10.0.2.1')
+    h4 = net.addHost('h4', cls=Host, ip='10.0.2.3/24', defaultRoute='via 10.0.2.1')
 
     info( '*** Add links\n')
     net.addLink(h1, s1)
@@ -54,16 +55,30 @@ def myNetwork():
     net.addLink(h4, s2)
     net.addLink(s2, r5)
     net.addLink(s1, r3)
-    #change: added link parameters for r3,r4 and r4,r5
-    net.addLink(r3, r4,intfName1='r3-eth1',params1={'ip':'192.168.1.1/30'}, intfName2='r4-eth0', params2={'ip':'192.168.1.2/30'})
-    net.addLink(r4, r5, intfName3='r4-eth1',params3={'ip':'192.168.2.1/30'}, intfName4='r5-eth0', params4={'ip':'192.168.2.2/30'})
+    
+    #Added link parameters for r3,r4 and r4,r5
+    net.addLink(r3, r4, intfName1='r3-eth1',params1={'ip':'192.168.1.1/30'}, intfName2='r4-eth0', params2={'ip':'192.168.1.2/30'})
+    net.addLink(r4, r5, intfName1='r4-eth1',params1={'ip':'192.168.2.1/30'}, intfName2='r5-eth1', params2={'ip':'192.168.2.2/30'})
 
     info( '*** Starting network\n')
     net.build()
+
+    #traffic through r3 to routed to r4
+    r3.cmd('ip route add 192.168.2.0/30 via 192.168.1.2 dev r3-eth1')
+    #traffic through r3 to routed to r5
+    r3.cmd('ip route add 10.0.2.0/24 via 192.168.1.2 dev r3-eth1')
     
-    #change: routing allows r4 to ping r3, h1, and h2
-    r3.cmd('ip route add 10.0.3.0 via 192.168.1.1 dev r3-eth1')
-  
+    #traffic through r4 is routed to r5
+    r4.cmd('ip route add 10.0.2.0/24 via 192.168.2.2 dev r4-eth1')
+    #traffic through r4 is routed to r3
+    r4.cmd('ip route add 10.0.1.0/24 via 192.168.1.1 dev r4-eth0')
+    
+    #traffic through r5 is routed to r3
+    r5.cmd('ip route add 10.0.1.0/24 via 192.168.2.1 dev r5-eth1')
+    #traffic through r5 is routed to r4
+    r5.cmd('ip route add 192.168.1.0/30 via 192.168.2.1 dev r5-eth1')
+   
+    
     info( '*** Starting controllers\n')
     for controller in net.controllers:
         controller.start()
