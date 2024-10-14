@@ -27,28 +27,35 @@ def myNetwork():
     s1 = net.addSwitch('s1', cls=OVSKernelSwitch)
     s2 = net.addSwitch('s2', cls=OVSKernelSwitch)
 
-    r5 = net.addHost('r5', cls=Node, ip='0.0.0.0')
+    info('*** Add routers\n')
+    #r5 ip 10.0.y.0/24 --> 10.0.2.0/24
+    r5 = net.addHost('r5', cls=Node, ip='10.0.2.0/24')
     r5.cmd('sysctl -w net.ipv4.ip_forward=1')
-    r4 = net.addHost('r4', cls=Node, ip='0.0.0.0')
+
+    r4 = net.addHost('r4', cls=Node, ip='192.168.1.2/30')
     r4.cmd('sysctl -w net.ipv4.ip_forward=1')
-    r3 = net.addHost('r3', cls=Node, ip='0.0.0.0')
+
+    #r3 ip  10.0.x.0/24 --> 10.0.1.0/24
+    r3 = net.addHost('r3', cls=Node, ip='10.0.1.0/24')
     r3.cmd('sysctl -w net.ipv4.ip_forward=1')
 
     info( '*** Add hosts\n')
-    h1 = net.addHost('h1', cls=Host, ip='10.0.0.1', defaultRoute=None)
-    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute=None)
-    h3 = net.addHost('h3', cls=Host, ip='10.0.0.3', defaultRoute=None)
-    h4 = net.addHost('h4', cls=Host, ip='10.0.0.4', defaultRoute=None)
+    h1 = net.addHost('h1', cls=Host, ip='10.0.0.1', defaultRoute='via 10.0.1.0')
+    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute='via 10.0.1.0')
+    h3 = net.addHost('h3', cls=Host, ip='10.0.0.3', defaultRoute='via 10.0.2.0')
+    h4 = net.addHost('h4', cls=Host, ip='10.0.0.4', defaultRoute='via 10.0.2.0')
 
     info( '*** Add links\n')
     net.addLink(h1, s1)
     net.addLink(h2, s1)
     net.addLink(h3, s2)
     net.addLink(h4, s2)
+
     net.addLink(s2, r5)
     net.addLink(s1, r3)
-    net.addLink(r3, r4)
-    net.addLink(r4, r5)
+    #add link parameters
+    net.addLink(r3, r4, intfName1='r3-eth1', params1={'ip': '192.168.1.1/30'}, intfName2='r4-eth0',params2={'ip': '192.168.1.2/30'})
+    net.addLink(r4, r5, intfName1='r4-eth1', params1={'ip': '192.168.2.1/30'}, intfName2='r5-eth0',params2={'ip': '192.168.2.2/30'})
 
     info( '*** Starting network\n')
     net.build()
