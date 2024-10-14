@@ -38,10 +38,10 @@ def myNetwork():
     r5.cmd('sysctl -w net.ipv4.ip_forward=1')
 
     info( '*** Add hosts\n')
-    h1 = net.addHost('h1', cls=Host, ip='10.0.1.2', defaultRoute='via 10.0.1.1')
-    h2 = net.addHost('h2', cls=Host, ip='10.0.1.3', defaultRoute='via 10.0.1.1')
-    h3 = net.addHost('h3', cls=Host, ip='10.0.2.2', defaultRoute='via 10.0.2.1')
-    h4 = net.addHost('h4', cls=Host, ip='10.0.2.3', defaultRoute='via 10.0.2.1')
+    h1 = net.addHost('h1', cls=Host, ip='10.0.1.2/24', defaultRoute='via 10.0.1.1')
+    h2 = net.addHost('h2', cls=Host, ip='10.0.1.3/24', defaultRoute='via 10.0.1.1')
+    h3 = net.addHost('h3', cls=Host, ip='10.0.2.2/24', defaultRoute='via 10.0.2.1')
+    h4 = net.addHost('h4', cls=Host, ip='10.0.2.3/24', defaultRoute='via 10.0.2.1')
 
     info( '*** Add links\n')
     net.addLink(h1, s1)
