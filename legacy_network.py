@@ -8,6 +8,8 @@ from mininet.node import IVSSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 from mininet.link import TCLink, Intf
+from mininet.term import makeTerm
+import time
 from subprocess import call
 
 def myNetwork():
@@ -80,10 +82,16 @@ def myNetwork():
     net.get('s2').start([c0])
     net.get('s1').start([c0])
 
-    info( '*** Post configure switches and hosts\n')
+    info( '*** Post configure switches and hosts\n') # where Chris Started
+    makeTerm(h4, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_server.py; bash')
+    time.sleep(3) # needs time in order for server to setup
+    makeTerm(h3, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
+    makeTerm(h2, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
+    makeTerm(h1, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
 
     CLI(net)
     net.stop()
+    net.stopXterms() # where Chris Ended
 
 if __name__ == '__main__':
     setLogLevel( 'info' )

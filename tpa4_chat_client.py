@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 # Set global variables
-server_name = '10.0.0.1'  # should we set to have node h1 running server code correct?
+server_name = '10.0.2.3'  # IP of h4
 server_port = 12000
 
 

@@ -92,7 +92,7 @@ def connection_handler(connection_socket, address):
     client_count -= 1
 
     for receiver in connections:
-        receiver.send(str(user_name + ": " + query).encode())
+        receiver.send(str(user_name + " has logged out").encode())
 
     if client_count == 0:
         is_all_clients_exit = True
