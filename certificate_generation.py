@@ -3,6 +3,7 @@ import subprocess
 
 # Prompt for common name and passphrase (should be tpa4.chat.test)
 common_name = input("Enter your chat server's common name: ")
+challenge_password = input("Enter a challenge password for the server private key: ")
 
 # Write common name in a text file for later reference
 with open("common_name.txt", "w") as f:
@@ -31,7 +32,10 @@ def generate_private_key(common_name):
     
     try:
         # Construct the command to generate the private key
-        command = ["sudo", "openssl", "genrsa", "-out", key_file, "2048"]
+        command = [
+            "sudo", "openssl", "genrsa", "-out", key_file,
+            "-passout", f'pass:{challenge_password}', "2048"
+        ]
         
         # Run the command
         subprocess.run(command, check=True, cwd="/etc/ssl/demoCA")
@@ -55,7 +59,8 @@ def generate_csr(common_name):
         # Construct the command to generate the CSR
         command = [
             "sudo", "openssl", "req", "-nodes", "-new", 
-            "-config", config_file, "-key", key_file, "-out", csr_file,
+            "-config", config_file, "-key", key_file, 
+            "-passin", f'pass:{challenge_password}', "-out", csr_file,
             "-subj", "/C=US/ST=CA/L=Seaside/O=CST311/OU=Networking/CN=tpa4.chat.test"
         ]
         
