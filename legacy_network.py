@@ -88,10 +88,12 @@ def myNetwork():
 
     info( '*** Post configure switches and hosts\n') # where Chris Started
     makeTerm(h4, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_server.py; bash')
-    time.sleep(3) # needs time in order for server to setup
-    makeTerm(h3, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
-    makeTerm(h2, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
+    time.sleep(5) # needs time in order for server to setup
     makeTerm(h1, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
+    time.sleep(1)
+    makeTerm(h2, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
+    time.sleep(1)
+    makeTerm(h3, title='Node', term='xterm', display=None, cmd='python3 CST311/PA4/tpa4_chat_client.py; bash')
 
     CLI(net)
     net.stop()

@@ -28,6 +28,7 @@ pending_msgs = []
 client_count = 0
 client_count_max = 3
 is_all_clients_exit = False
+user_names = ["Client X", "Client Y", "Client Z"]
 
 
 def connection_handler(connection_socket, address):
@@ -36,9 +37,10 @@ def connection_handler(connection_socket, address):
     receiver2 = None
 
     # assign initial query to connections user_name
-    query = connection_socket.recv(1024).decode()
-    user_name = query
-    user_id = len(connections) - 1
+    # query = connection_socket.recv(1024).decode()
+    # user_name = query
+    # user_id = len(connections) - 1
+    user_name = user_names.pop(0)
 
     # get all pending messages sent to current client connection
     for msg in pending_msgs:
@@ -92,7 +94,7 @@ def connection_handler(connection_socket, address):
     client_count -= 1
 
     for receiver in connections:
-        receiver.send(str(user_name + " has logged out").encode())
+        receiver.send(str(user_name + " has disconnected").encode())
 
     if client_count == 0:
         is_all_clients_exit = True

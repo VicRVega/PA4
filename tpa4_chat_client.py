@@ -13,6 +13,7 @@ import threading
 
 # Configure logging
 import logging
+import os
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def main():
         exit(8)
 
     # Get input from user
-    user_input = input('Welcome to the chat! Please Enter in your username:\n')
+    user_input = input('Welcome to the chat! To send a message, type the message and click enter.\n')
 
     try:
         # keep the connection open as long as the message is not 'bye'
@@ -76,6 +77,7 @@ def main():
         client_socket.send(user_input.encode())
         # Close socket prior to exit
         client_socket.close()
+        os.system("clear")
         t.join()
 
 
