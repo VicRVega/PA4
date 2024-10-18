@@ -56,7 +56,7 @@ def generate_csr(common_name):
         command = [
             "sudo", "openssl", "req", "-nodes", "-new", 
             "-config", config_file, "-key", key_file, "-out", csr_file,
-            "-subj", '"/C=US/ST=CA/L=Seaside/O=CST311/OU=Networking/CN=tpa4.chat.test"'
+            "-subj", "/C=US/ST=CA/L=Seaside/O=CST311/OU=Networking/CN=tpa4.chat.test"
         ]
         
         # Run the command
