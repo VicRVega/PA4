@@ -9,6 +9,10 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 from mininet.link import TCLink, Intf
 from subprocess import call
+import subprocess
+
+# Note: path may be different dependent on where the certificate_generation file is located.
+subprocess.run(["sudo", "-E", "python3", "CST311/PA4/certificate_generation.py"])
 
 def myNetwork():
 
