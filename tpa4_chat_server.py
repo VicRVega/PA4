@@ -30,7 +30,6 @@ client_count_max = 3
 is_all_clients_exit = False
 user_names = ["Client X", "Client Y", "Client Z"]
 
-
 def connection_handler(connection_socket, address):
     global connections, addresses, client_count, pending_msgs, is_all_clients_exit
     receiver1 = None
@@ -49,6 +48,7 @@ def connection_handler(connection_socket, address):
 
     # Initial message to other clients
     query = connection_socket.recv(1024).decode()
+    print("Message from " + user_name + ": " + query)
     while query != "bye":
 
         # condition of only one client in the server, append all msgs to pending_msgs
@@ -86,6 +86,7 @@ def connection_handler(connection_socket, address):
 
         # this blocks, if no message has been received
         query = connection_socket.recv(1024).decode()
+        print("Message from " + user_name + ": " + query)
 
     # connection close out after client says bye
     # decrement client_count, take out address, and connection_socket from associated arrays
@@ -93,12 +94,15 @@ def connection_handler(connection_socket, address):
     connections.remove(connection_socket)
     client_count -= 1
 
+
     for receiver in connections:
         receiver.send(str(user_name + " has disconnected").encode())
 
     if client_count == 0:
         is_all_clients_exit = True
 
+    print("INFO:___main___: " + user_name + " has left the chat.")
+    print("INFO:___main___: Closing connection to " + user_name)
     # Close client socket
     connection_socket.close()
 
@@ -154,3 +158,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
