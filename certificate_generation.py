@@ -23,7 +23,7 @@ def modify_hosts_file(ip_address, common_name):
         print(f"Failed to modify /etc/hosts: {e}")
         exit(1)
 
-modify_hosts_file("10.0.0.4", common_name)
+modify_hosts_file("10.0.2.3", common_name)
 
 
 # Generate private key for server

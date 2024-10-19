@@ -15,6 +15,10 @@ import threading
 
 # Configure logging
 import logging
+import ssl
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain("/etc/ssl/demoCA/newcerts/tpa4.chat.test-cert.pem", "/etc/ssl/demoCA/private/tpa4.chat.test-key.pem")
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -129,8 +133,9 @@ def main():
             # When a client connects, create a new socket and record their address
 
             connection_socket, address = server_socket.accept()
+            ssock = context.wrap_socket(connection_socket, server_side=True)
             client_count += 1
-            connections.append(connection_socket)
+            connections.append(ssock)
             addresses.append(address)
 
             log.info("Connected to client at " + str(address) + "\nconnection_socket: " + str(connection_socket))
@@ -141,7 +146,7 @@ def main():
             # connection_handler(connection_socket, address)
 
             # implementation of threading
-            t = threading.Thread(target=connection_handler, args=(connection_socket, address))
+            t = threading.Thread(target=connection_handler, args=(ssock, address))
 
             # starts thread, which initiates connection_handler function for the current client connected.
             t.start()
