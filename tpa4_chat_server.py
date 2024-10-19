@@ -10,15 +10,20 @@ __credits__ = [
 ]
 
 import socket as s
+import ssl
 import time
 import threading
 
 # Configure logging
 import logging
+from lib2to3.fixes.fix_input import context
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain('/etc/ssl/demoCA/newcerts/tpa4.chat.test-cert.pem', '/etc/ssl/demoCA/private/tpa4.chat.test-key.pem')
 
 server_port = 12000
 thread_list = []
@@ -113,11 +118,15 @@ def main():
     # Notice the use of SOCK_STREAM for TCP packets
     server_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
 
+
+
+
     # Assign port number to socket, and bind to chosen port
     server_socket.bind(('', server_port))
 
     # Configure how many requests can be queued on the server at once
     server_socket.listen(client_count_max)
+    ssock = context.wrap_socket(server_socket, server_side=True)
 
     # Alert user we are now online
     log.info("The server is ready to receive on port " + str(server_port))
@@ -128,7 +137,7 @@ def main():
         for i in range(client_count_max):
             # When a client connects, create a new socket and record their address
 
-            connection_socket, address = server_socket.accept()
+            connection_socket, address = ssock.accept()
             client_count += 1
             connections.append(connection_socket)
             addresses.append(address)

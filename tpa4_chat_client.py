@@ -9,6 +9,7 @@ __credits__ = [
 
 # Import statements
 import socket as s
+import ssl
 import threading
 
 # Configure logging
@@ -21,7 +22,10 @@ log.setLevel(logging.DEBUG)
 
 # Set global variables
 server_name = '10.0.2.3'  # IP of h4
+# server_name = 'tpa4.chat.test'
 server_port = 12000
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+context.load_verify_locations('/etc/ssl/demoCA/newcerts/tpa4.chat.test-cert.pem')
 
 
 def incoming_message_handler(client_socket):
@@ -39,12 +43,13 @@ def incoming_message_handler(client_socket):
 def main():
     # Create socket
     client_socket = s.socket(s.AF_INET, s.SOCK_STREAM)
+    ssock = context.wrap_socket(client_socket, server_hostname='tpa4.chat.test')
 
-    t = threading.Thread(target=incoming_message_handler, args=(client_socket,))
+    t = threading.Thread(target=incoming_message_handler, args=(ssock,))
     t.start()
     try:
         # Establish TCP connection
-        client_socket.connect((server_name, server_port))
+        ssock.connect(('tpa4.chat.test', server_port))
     except Exception as e:
         log.exception(e)
         log.error("***Advice:***")
@@ -64,7 +69,7 @@ def main():
         while user_input != 'bye':
             # Set data across socket to server
             #  Note: encode() converts the string to UTF-8 for transmission
-            client_socket.send(user_input.encode())
+            ssock.send(user_input.encode())
 
             # Get input from user
             user_input = input()
@@ -74,7 +79,7 @@ def main():
         user_input = 'bye'
         # Set data across socket to server
         #  Note: encode() converts the string to UTF-8 for transmission
-        client_socket.send(user_input.encode())
+        ssock.send(user_input.encode())
         # Close socket prior to exit
         client_socket.close()
         os.system("clear")
